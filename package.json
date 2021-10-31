@@ -1,5 +1,5 @@
 {
-  "name": "making-of",
+	"name": "making-of",
 	"displayName": "Making-Of",
 	"description": "",
 	"version": "0.0.1",
@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:making-of.commit"
+		"onCommand:making-of.commit"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -20,7 +20,15 @@
 				"title": "Commit",
 				"category": "Making-Of"
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "making-of.commit",
+					"when": "editorLangId == markdown"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
