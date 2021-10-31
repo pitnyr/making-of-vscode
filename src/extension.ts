@@ -16,14 +16,31 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('making-of.commit', () => {
 		// The code you place here will be executed every time your command is executed
 
+		// Is there an active editor?
+		let editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showErrorMessage('Making-Of Commit: no editor found');
+			return;
+		}
+
+		// Check whether there's some text selected
+		if (editor.selection.isEmpty) {
+			vscode.window.showErrorMessage('Making-Of Commit: nothing selected');
+			return;
+		}
+
+		// Get the selected text
+		let text = editor.document.getText(editor.selection);
+		// todo: check for valid syntax
+
 		// Get the making-of branch suffix
 		let suffix = vscode.workspace.getConfiguration('making-of').get('branchDirSuffix');
 
 		// Get the name of the current file
-		let path = vscode.window.activeTextEditor?.document.uri.path;
+		let path = editor.document.uri.path;
 
 		// Display a message box to the user
-		vscode.window.showWarningMessage('Now performing a commit in ' + suffix + ' from ' + path);
+		vscode.window.showInformationMessage('Now performing a commit in "' + suffix + '" from "' + path + '" with "' + text + '"');
 	});
 
 	context.subscriptions.push(disposable);
