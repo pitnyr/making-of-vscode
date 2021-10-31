@@ -15,8 +15,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('making-of.commit', () => {
 		// The code you place here will be executed every time your command is executed
+
+		// Get the making-of branch suffix
+		let suffix = vscode.workspace.getConfiguration('making-of').get('branchDirSuffix');
+
+		// Get the name of the current file
+		let path = vscode.window.activeTextEditor?.document.uri.path;
+
 		// Display a message box to the user
-		vscode.window.showWarningMessage('Now performing a commit...');
+		vscode.window.showWarningMessage('Now performing a commit in ' + suffix + ' from ' + path);
 	});
 
 	context.subscriptions.push(disposable);

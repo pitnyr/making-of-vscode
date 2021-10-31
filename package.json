@@ -28,6 +28,16 @@
 					"when": "editorLangId == markdown"
 				}
 			]
+		},
+		"configuration": {
+			"title": "Making-Of Settings",
+			"properties": {
+				"making-of.branchDirSuffix": {
+					"type": "string",
+					"default": null,
+					"description": "Suffix for the directory with the making-of branch."
+				}
+			}
 		}
 	},
 	"scripts": {
