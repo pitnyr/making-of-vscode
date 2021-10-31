@@ -1,6 +1,6 @@
 {
-  "name": "vscode-making-of",
-	"displayName": "vscode-making-of",
+  "name": "making-of",
+	"displayName": "Making-Of",
 	"description": "",
 	"version": "0.0.1",
 	"engines": {
@@ -10,14 +10,15 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:vscode-making-of.helloWorld"
+        "onCommand:making-of.commit"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "vscode-making-of.helloWorld",
-				"title": "Hello World"
+				"command": "making-of.commit",
+				"title": "Commit",
+				"category": "Making-Of"
 			}
 		]
 	},
