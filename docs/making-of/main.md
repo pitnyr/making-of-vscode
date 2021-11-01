@@ -35,6 +35,15 @@ subject: Add first commit: MIT license file
 ```
 
 
-## Step 2
+## Step 2 - Getting Started
 
 For setting up the getting started example I create a feature branch named "[start](start.md)".
+
+<a id="commit-2021-11-01-21-00"></a>
+
+[commit-2021-11-01-21-00](https://github.com/pitnyr/making-of-vscode/commit/7f341007c49fb5c9bad93be71ad0daf02b73a41d)
+```email
+subject: Merge branch 'start'
+
+Implement a first version of the VS Code extension.
+```
