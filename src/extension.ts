@@ -1,50 +1,60 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+import * as child_process from 'child_process';
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+
+export function deactivate() { }
+
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
+	let command = vscode.commands.registerTextEditorCommand('making-of.commit', commit);
+	context.subscriptions.push(command);
+
 	console.log('Congratulations, your extension "making-of" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('making-of.commit', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Is there an active editor?
-		let editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			vscode.window.showErrorMessage('Making-Of Commit: no editor found');
-			return;
-		}
-
-		// Check whether there's some text selected
-		if (editor.selection.isEmpty) {
-			vscode.window.showErrorMessage('Making-Of Commit: nothing selected');
-			return;
-		}
-
-		// Get the selected text
-		let text = editor.document.getText(editor.selection);
-		// todo: check for valid syntax
-
-		// Get the making-of branch suffix
-		let suffix = vscode.workspace.getConfiguration('making-of').get('branchDirSuffix');
-
-		// Get the name of the current file
-		let path = editor.document.uri.path;
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Now performing a commit in "' + suffix + '" from "' + path + '" with "' + text + '"');
-	});
-
-	context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+
+async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
+	if (editor.selection.isEmpty) {
+		vscode.window.showErrorMessage('Making-Of Commit: nothing selected');
+		return;
+	}
+
+	let text = editor.document.getText(editor.selection);
+	// todo: check for valid syntax
+
+	try {
+		const commandOutput = await executeCommand(text);
+		vscode.window.showInformationMessage('Output "' + commandOutput + '"');
+	} catch (error) {
+		if (error instanceof Error) {
+			vscode.window.showErrorMessage('Error: ' + error.message);
+		} else {
+			vscode.window.showErrorMessage('Unknown Error');
+		}
+	}
+}
+
+async function executeCommand(input: string): Promise<string> {
+	const process = child_process.spawn('/bin/sh', ['-c', 'pwd && whoami']);
+
+	let stdoutString = '';
+	let stderrString = '';
+
+	process.stdin?.write(input);
+	process.stdin?.end();
+
+	process.stdout?.on('data', data => { stdoutString += data.toString(); });
+	process.stderr?.on('data', data => { stderrString += data.toString(); });
+
+	return new Promise((resolve, reject) => {
+		process.on('error', err => {
+			reject(err);
+		});
+		process.on('close', code => {
+			if (code !== 0) {
+				reject(new Error('(' + code + ') ' + stderrString.trim()));
+			} else {
+				resolve(stdoutString);
+			}
+		});
+	});
+}
