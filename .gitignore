@@ -1,5 +1,8 @@
-out
+.gh-pages/
+.vscode-test/
+
+*.vsix
+
 dist
 node_modules
-.vscode-test/
-*.vsix
+out
