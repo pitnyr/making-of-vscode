@@ -47,3 +47,29 @@ subject: Merge branch 'start'
 
 Implement a first version of the VS Code extension.
 ```
+
+
+## Step 3 - Edit With Shell Command
+
+In feature branch "[shell](shell.md)" I'll copy the basics I need from the "Edit With Shell Command" extension.
+
+But before that, I move the gh-pages workspace into a ".gitignored" subfolder of the project root
+and add a VS Code workspace with the gh-pages folder and the root folder:
+
+<a id="commit-2021-11-14-07-40"></a>
+
+[commit-2021-11-14-07-40](https://github.com/pitnyr/making-of-vscode/commit/717856eda8f70d3fa5caad3e75a02ab415bee977)
+```email
+subject: Change editing environment
+```
+
+Implemented:
+
+<a id="commit-2021-11-14-15-25"></a>
+
+[commit-2021-11-14-15-25](https://github.com/pitnyr/making-of-vscode/commit/0adfe88f4bb40a911d95210fc022818d70e3365e)
+```email
+subject: Merge branch 'shell'
+
+Edit With Shell Command.
+```
