@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 
-async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
+async function commit(editor: vscode.TextEditor) {
 	if (editor.selection.isEmpty) {
 		vscode.window.showErrorMessage('Making-Of Commit: nothing selected');
 		return;
@@ -32,7 +32,8 @@ async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
 
 	try {
 		const commandOutput = await executeCommand(text, cwd);
-		vscode.window.showInformationMessage('Output "' + commandOutput + '"');
+		editor.edit(editBuilder => editBuilder.replace(editor.selection, commandOutput));
+		vscode.window.showInformationMessage('Done');
 	} catch (error) {
 		if (error instanceof Error) {
 			vscode.window.showErrorMessage('Error: ' + error.message);
@@ -43,7 +44,7 @@ async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
 }
 
 async function executeCommand(input: string, cwd: string): Promise<string> {
-	const process = child_process.spawn('/bin/sh', ['-c', 'pwd && whoami'], { cwd: cwd });
+	const process = child_process.spawn('/bin/sh', ['-c', 'sed "s/^/| /"'], { cwd: cwd });
 
 	let stdoutString = '';
 	let stderrString = '';
