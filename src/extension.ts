@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 export function deactivate() { }
 
 export function activate(context: vscode.ExtensionContext) {
-	let command = vscode.commands.registerTextEditorCommand('making-of.commit', commit);
+	const command = vscode.commands.registerTextEditorCommand('making-of.commit', commit);
 	context.subscriptions.push(command);
 
 	console.log('Congratulations, your extension "making-of" is now active!');
@@ -18,11 +18,20 @@ async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
 		return;
 	}
 
-	let text = editor.document.getText(editor.selection);
+	const text = editor.document.getText(editor.selection);
 	// todo: check for valid syntax
 
+	const folders = vscode.workspace.workspaceFolders;
+	if (folders === undefined || folders.length === 0) {
+		vscode.window.showErrorMessage('Making-Of Commit: no workspace folders');
+		return;
+	}
+	const cwd: string = folders
+		.map((folder) => folder.uri.fsPath)
+		.reduce((p1, p2) => p1.length < p2.length ? p1 : p2);
+
 	try {
-		const commandOutput = await executeCommand(text);
+		const commandOutput = await executeCommand(text, cwd);
 		vscode.window.showInformationMessage('Output "' + commandOutput + '"');
 	} catch (error) {
 		if (error instanceof Error) {
@@ -33,8 +42,8 @@ async function commit(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
 	}
 }
 
-async function executeCommand(input: string): Promise<string> {
-	const process = child_process.spawn('/bin/sh', ['-c', 'pwd && whoami']);
+async function executeCommand(input: string, cwd: string): Promise<string> {
+	const process = child_process.spawn('/bin/sh', ['-c', 'pwd && whoami'], { cwd: cwd });
 
 	let stdoutString = '';
 	let stderrString = '';
