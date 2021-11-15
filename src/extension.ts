@@ -18,15 +18,15 @@ async function commit(editor: vscode.TextEditor) {
 		const sourceLink = await getSourceLink(vscode.workspace);
 		const makingOfLink = await getMakingOfLink(editor, vscode.workspace);
 
-		const selectedText = await getSelectedText(editor);
+		const selectedLines = await getSelectedLines(editor);
 		const commitId = getCommitId();
-		const commitMessage = await getCommitMessage(selectedText, makingOfLink, commitId);
+		const commitMessage = await getCommitMessage(selectedLines, makingOfLink, commitId);
 		const cwd = await getCwd(vscode.workspace.workspaceFolders);
 
 		const commitHash = await executeCommit(commitMessage, cwd);
 
-		const finalText = getFinalText(selectedText, commitId, sourceLink, commitHash);
-		replaceSelectedText(editor, finalText);
+		const finalText = getFinalText(selectedLines, commitId, sourceLink, commitHash);
+		await replaceSelectedText(editor, finalText);
 
 		vscode.window.setStatusBarMessage('Done', 3000);
 
@@ -93,12 +93,15 @@ async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vsco
 	});
 }
 
-async function getSelectedText(editor: vscode.TextEditor): Promise<string[]> {
+async function getSelectedLines(editor: vscode.TextEditor): Promise<string[]> {
 	return new Promise((resolve, reject) => {
 		if (editor.selection.isEmpty) {
 			reject(new Error('nothing selected'));
 		} else {
-			resolve(editor.document.getText(editor.selection).split('\n'));
+			const lines = editor.document.getText(editor.selection).split('\n')
+				.map((line) => line.trimEnd());
+			lines[0] = lines[0].trimStart();  // subject
+			resolve(lines);
 		}
 	});
 }
@@ -113,19 +116,16 @@ function getCommitId(): string {
 		('0' + now.getMinutes()).slice(-2);
 }
 
-async function getCommitMessage(selectedText: string[], makingOfLink: string, commitId: string): Promise<string> {
+async function getCommitMessage(selectedLines: string[], makingOfLink: string, commitId: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 
-		if (selectedText.length === 0) {
-			reject(new Error('nothing selected'));
-			return;
-		} else if (selectedText[selectedText.length - 1].length > 0) {
+		if (selectedLines[selectedLines.length - 1].length > 0) {
 			reject(new Error('last selected line without linefeed'));
 			return;
 		}
-		selectedText.pop();
+		selectedLines.pop();
 
-		const subject = selectedText[0].trim();
+		const subject = selectedLines[0];
 		if (subject.length === 0) {
 			reject(new Error('subject (first line) is empty'));
 			return;
@@ -134,9 +134,9 @@ async function getCommitMessage(selectedText: string[], makingOfLink: string, co
 			return;
 		}
 
-		const body = selectedText.slice(1).map((line) => line.trimEnd());
+		const body = selectedLines.slice(1);
 		if (body.length > 0) {
-			if (body[0].trim().length > 0) {
+			if (body[0].length > 0) {
 				reject(new Error('delimiter (second line) is not empty'));
 				return;
 			} else if (body.length === 1) {
@@ -191,21 +191,23 @@ async function executeCommit(input: string, cwd: string): Promise<string> {
 			if (code !== 0) {
 				reject(new Error('(' + code + ') ' + stderrString.trim()));
 			} else {
-				resolve(stdoutString);
+				resolve(stdoutString.trimEnd());
 			}
 		});
 	});
 }
 
-function getFinalText(selectedText: string[], commitId: string, sourceLink: string, commitHash: string) {
+function getFinalText(selectedLines: string[], commitId: string, sourceLink: string, commitHash: string) {
 	return '<a id="' + commitId + '"></a>\n' +
 		'\n' +
 		'[' + commitId + '](' + sourceLink + commitHash + ')\n' +
 		'```email\n' +
-		'subject: ' + selectedText.join('\n') + '\n' +
+		'subject: ' + selectedLines.join('\n') + '\n' +
 		'```\n';
 }
 
-function replaceSelectedText(editor: vscode.TextEditor, finalText: string) {
-	editor.edit(editBuilder => editBuilder.replace(editor.selection, finalText));
+async function replaceSelectedText(editor: vscode.TextEditor, finalText: string) {
+	await editor.edit(editBuilder => editBuilder.replace(editor.selection, finalText));
+	const endPos = editor.selection.end;
+	editor.selection = new vscode.Selection(endPos, endPos);
 }
