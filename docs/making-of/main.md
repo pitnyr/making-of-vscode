@@ -8,7 +8,7 @@ Support for writing "Making-Of" docs in VS Code.
 
 ## Features
 
-- [ ] Automatically perform commits from within the "Making-Of" docs
+- [x] [Automatically perform commits from within the "Making-Of" docs](#plan)
 
 
 ## Plan
@@ -73,3 +73,19 @@ subject: Merge branch 'shell'
 
 Edit With Shell Command.
 ```
+
+
+## Step 4 - Execute the real command
+
+This is handled in feature branch "[real-command](real-command.md)".
+
+<a id="commit-2021-11-15-10-50"></a>
+
+[commit-2021-11-15-10-50](https://github.com/pitnyr/making-of-vscode/commit/b89bc0bb99de1dcbfe9a6f94f49279da02654c7e)
+```email
+subject: Merge branch 'real-command'
+
+Execute the real command.
+```
+
+The extension should be usable now!
