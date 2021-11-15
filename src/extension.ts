@@ -13,34 +13,49 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 async function commit(editor: vscode.TextEditor) {
-	if (editor.selection.isEmpty) {
-		vscode.window.showErrorMessage('Making-Of Commit: nothing selected');
-		return;
-	}
-
-	const text = editor.document.getText(editor.selection);
-	// todo: check for valid syntax
-
-	const folders = vscode.workspace.workspaceFolders;
-	if (folders === undefined || folders.length === 0) {
-		vscode.window.showErrorMessage('Making-Of Commit: no workspace folders');
-		return;
-	}
-	const cwd: string = folders
-		.map((folder) => folder.uri.fsPath)
-		.reduce((p1, p2) => p1.length < p2.length ? p1 : p2);
-
 	try {
-		const commandOutput = await executeCommand(text, cwd);
+
+		const selectedText = await getSelectedText(editor);
+		const cwd = await getCwd(vscode.workspace.workspaceFolders);
+
+		const commandOutput = await executeCommand(selectedText, cwd);
+
 		editor.edit(editBuilder => editBuilder.replace(editor.selection, commandOutput));
-		vscode.window.showInformationMessage('Done');
+		vscode.window.setStatusBarMessage('Done', 3000);
+
 	} catch (error) {
-		if (error instanceof Error) {
-			vscode.window.showErrorMessage('Error: ' + error.message);
-		} else {
-			vscode.window.showErrorMessage('Unknown Error');
-		}
+		handleError('Making-Of Commit', error);
 	}
+}
+
+function handleError(title: string, error: unknown) {
+	if (error instanceof Error) {
+		vscode.window.showErrorMessage(title + ': ' + error.message);
+	} else {
+		vscode.window.showErrorMessage(title + ': Unknown Error');
+	}
+}
+
+async function getSelectedText(editor: vscode.TextEditor): Promise<string> {
+	return new Promise((resolve, reject) => {
+		if (editor.selection.isEmpty) {
+			reject(new Error('nothing selected'));
+		} else {
+			resolve(editor.document.getText(editor.selection));
+		}
+	});
+}
+
+async function getCwd(folders: readonly vscode.WorkspaceFolder[] | undefined): Promise<string> {
+	return new Promise((resolve, reject) => {
+		if (folders === undefined || folders.length === 0) {
+			reject(new Error('no workspace folders'));
+		} else {
+			resolve(folders
+				.map((folder) => folder.uri.fsPath)
+				.reduce((p1, p2) => p1.length < p2.length ? p1 : p2));
+		}
+	});
 }
 
 async function executeCommand(input: string, cwd: string): Promise<string> {
