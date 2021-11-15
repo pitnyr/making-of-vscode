@@ -1,4 +1,5 @@
 import * as child_process from 'child_process';
+import * as path from 'path';
 import * as vscode from 'vscode';
 
 
@@ -14,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 async function commit(editor: vscode.TextEditor) {
 	try {
+		const makingOfLink = await getMakingOfLink(editor, vscode.workspace);
 
 		const selectedText = await getSelectedText(editor);
 		const cwd = await getCwd(vscode.workspace.workspaceFolders);
@@ -34,6 +36,39 @@ function handleError(title: string, error: unknown) {
 	} else {
 		vscode.window.showErrorMessage(title + ': Unknown Error');
 	}
+}
+
+async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vscode.workspace): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const settings = workspace.getConfiguration('making-of');
+
+		let publishPath = settings.get<string>('publishPath');
+		if (!publishPath || publishPath.length === 0) {
+			reject(new Error('publishPath setting not configured'));
+			return;
+		}
+		if (!publishPath.endsWith('/')) {
+			publishPath += '/';
+		}
+
+		let localPath = settings.get<string>('localPath');
+		if (!localPath || localPath.length === 0) {
+			reject(new Error('localPath setting not configured'));
+			return;
+		}
+		if (!localPath.endsWith('/')) {
+			localPath += '/';
+		}
+
+		const filePath = editor.document.uri.fsPath;
+		const startIndex = filePath.indexOf(localPath);
+		if (startIndex < 0) {
+			reject(new Error('current file not in localPath'));
+		} else {
+			const base = path.dirname(filePath) + '/' + path.basename(filePath, '.md');
+			resolve(publishPath + base.slice(startIndex + localPath.length) + '.html');
+		}
+	});
 }
 
 async function getSelectedText(editor: vscode.TextEditor): Promise<string> {

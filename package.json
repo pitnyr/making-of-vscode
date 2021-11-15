@@ -32,10 +32,15 @@
 		"configuration": {
 			"title": "Making-Of Settings",
 			"properties": {
-				"making-of.branchDirSuffix": {
+				"making-of.publishPath": {
 					"type": "string",
 					"default": null,
-					"description": "Suffix for the directory with the making-of branch."
+					"description": "Path to the published making-of files"
+				},
+				"making-of.localPath": {
+					"type": "string",
+					"default": "/docs/",
+					"description": "Path component of the local making-of root"
 				}
 			}
 		}
