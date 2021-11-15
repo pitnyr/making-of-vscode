@@ -22,7 +22,7 @@ async function commit(editor: vscode.TextEditor) {
 		const commitMessage = await getCommitMessage(selectedText, makingOfLink, commitId);
 		const cwd = await getCwd(vscode.workspace.workspaceFolders);
 
-		const commandOutput = await executeCommand(commitMessage, cwd);
+		const commandOutput = await executeCommit(commitMessage, cwd);
 
 		editor.edit(editBuilder => editBuilder.replace(editor.selection, commandOutput));
 		vscode.window.setStatusBarMessage('Done', 3000);
@@ -148,8 +148,11 @@ async function getCwd(folders: readonly vscode.WorkspaceFolder[] | undefined): P
 	});
 }
 
-async function executeCommand(input: string, cwd: string): Promise<string> {
-	const process = child_process.spawn('/bin/sh', ['-c', 'sed "s/^/| /"'], { cwd: cwd });
+async function executeCommit(input: string, cwd: string): Promise<string> {
+	const process = child_process.spawn(
+		'/bin/sh',
+		['-c', 'git commit --quiet --file=- && git rev-parse --verify HEAD'],
+		{ cwd: cwd });
 
 	let stdoutString = '';
 	let stderrString = '';
