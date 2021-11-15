@@ -23,9 +23,11 @@ async function commit(editor: vscode.TextEditor) {
 		const commitMessage = await getCommitMessage(selectedText, makingOfLink, commitId);
 		const cwd = await getCwd(vscode.workspace.workspaceFolders);
 
-		const commandOutput = await executeCommit(commitMessage, cwd);
+		const commitHash = await executeCommit(commitMessage, cwd);
 
-		editor.edit(editBuilder => editBuilder.replace(editor.selection, commandOutput));
+		const finalText = getFinalText(selectedText, commitId, sourceLink, commitHash);
+		replaceSelectedText(editor, finalText);
+
 		vscode.window.setStatusBarMessage('Done', 3000);
 
 	} catch (error) {
@@ -193,4 +195,17 @@ async function executeCommit(input: string, cwd: string): Promise<string> {
 			}
 		});
 	});
+}
+
+function getFinalText(selectedText: string[], commitId: string, sourceLink: string, commitHash: string) {
+	return '<a id="' + commitId + '"></a>\n' +
+		'\n' +
+		'[' + commitId + '](' + sourceLink + commitHash + ')\n' +
+		'```email\n' +
+		'subject: ' + selectedText.join('\n') + '\n' +
+		'```\n';
+}
+
+function replaceSelectedText(editor: vscode.TextEditor, finalText: string) {
+	editor.edit(editBuilder => editBuilder.replace(editor.selection, finalText));
 }
