@@ -15,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 async function commit(editor: vscode.TextEditor) {
 	try {
+		const sourceLink = await getSourceLink(vscode.workspace);
 		const makingOfLink = await getMakingOfLink(editor, vscode.workspace);
 
 		const selectedText = await getSelectedText(editor);
@@ -40,17 +41,34 @@ function handleError(title: string, error: unknown) {
 	}
 }
 
+async function getSourceLink(workspace: typeof vscode.workspace): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const settings = workspace.getConfiguration('making-of');
+
+		let sourceUrl = settings.get<string>('sourceUrl');
+		if (!sourceUrl || sourceUrl.length === 0) {
+			reject(new Error('sourceUrl setting not configured'));
+			return;
+		}
+		if (!sourceUrl.endsWith('/')) {
+			sourceUrl += '/';
+		}
+
+		resolve(sourceUrl + 'commit/');
+	});
+}
+
 async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vscode.workspace): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const settings = workspace.getConfiguration('making-of');
 
-		let publishPath = settings.get<string>('publishPath');
-		if (!publishPath || publishPath.length === 0) {
-			reject(new Error('publishPath setting not configured'));
+		let publishUrl = settings.get<string>('publishUrl');
+		if (!publishUrl || publishUrl.length === 0) {
+			reject(new Error('publishUrl setting not configured'));
 			return;
 		}
-		if (!publishPath.endsWith('/')) {
-			publishPath += '/';
+		if (!publishUrl.endsWith('/')) {
+			publishUrl += '/';
 		}
 
 		let localPath = settings.get<string>('localPath');
@@ -68,7 +86,7 @@ async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vsco
 			reject(new Error('current file not in localPath'));
 		} else {
 			const base = path.dirname(filePath) + '/' + path.basename(filePath, '.md');
-			resolve(publishPath + base.slice(startIndex + localPath.length) + '.html');
+			resolve(publishUrl + base.slice(startIndex + localPath.length) + '.html');
 		}
 	});
 }

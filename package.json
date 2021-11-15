@@ -32,10 +32,15 @@
 		"configuration": {
 			"title": "Making-Of Settings",
 			"properties": {
-				"making-of.publishPath": {
+				"making-of.sourceUrl": {
 					"type": "string",
 					"default": null,
-					"description": "Path to the published making-of files"
+					"description": "URL of the source repository, for example https://github.com/<user>/<repo>/"
+				},
+				"making-of.publishUrl": {
+					"type": "string",
+					"default": null,
+					"description": "URL of the published making-of files, for example https://<user>.github.io/<repo>/"
 				},
 				"making-of.localPath": {
 					"type": "string",
