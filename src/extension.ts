@@ -18,9 +18,11 @@ async function commit(editor: vscode.TextEditor) {
 		const makingOfLink = await getMakingOfLink(editor, vscode.workspace);
 
 		const selectedText = await getSelectedText(editor);
+		const commitId = getCommitId();
+		const commitMessage = await getCommitMessage(selectedText, makingOfLink, commitId);
 		const cwd = await getCwd(vscode.workspace.workspaceFolders);
 
-		const commandOutput = await executeCommand(selectedText, cwd);
+		const commandOutput = await executeCommand(commitMessage, cwd);
 
 		editor.edit(editBuilder => editBuilder.replace(editor.selection, commandOutput));
 		vscode.window.setStatusBarMessage('Done', 3000);
@@ -71,13 +73,66 @@ async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vsco
 	});
 }
 
-async function getSelectedText(editor: vscode.TextEditor): Promise<string> {
+async function getSelectedText(editor: vscode.TextEditor): Promise<string[]> {
 	return new Promise((resolve, reject) => {
 		if (editor.selection.isEmpty) {
 			reject(new Error('nothing selected'));
 		} else {
-			resolve(editor.document.getText(editor.selection));
+			resolve(editor.document.getText(editor.selection).split('\n'));
 		}
+	});
+}
+
+function getCommitId(): string {
+	const now = new Date();
+	return 'commit-' +
+		now.getFullYear() + '-' +
+		('0' + (now.getMonth() + 1)).slice(-2) + '-' +
+		('0' + now.getDate()).slice(-2) + '-' +
+		('0' + now.getHours()).slice(-2) + '-' +
+		('0' + now.getMinutes()).slice(-2);
+}
+
+async function getCommitMessage(selectedText: string[], makingOfLink: string, commitId: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+
+		if (selectedText.length === 0) {
+			reject(new Error('nothing selected'));
+			return;
+		} else if (selectedText[selectedText.length - 1].length > 0) {
+			reject(new Error('last selected line without linefeed'));
+			return;
+		}
+		selectedText.pop();
+
+		const subject = selectedText[0].trim();
+		if (subject.length === 0) {
+			reject(new Error('subject (first line) is empty'));
+			return;
+		} else if (subject.length > 50) {
+			reject(new Error('subject (first line) is longer than 50 chars'));
+			return;
+		}
+
+		const body = selectedText.slice(1).map((line) => line.trimEnd());
+		if (body.length > 0) {
+			if (body[0].trim().length > 0) {
+				reject(new Error('delimiter (second line) is not empty'));
+				return;
+			} else if (body.length === 1) {
+				reject(new Error('delimiter without body'));
+				return;
+			} else if (body[body.length - 1].length === 0) {
+				reject(new Error('last body line is empty'));
+				return;
+			} else if (body.find((line) => line.length > 72) !== undefined) {
+				reject(new Error('some body lines are longer than 72 chars'));
+				return;
+			}
+		}
+
+		const linkLine = 'See ' + makingOfLink + '#' + commitId;
+		resolve([subject, '', linkLine, ...body, ''].join('\n'));
 	});
 }
 
