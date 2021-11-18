@@ -11,6 +11,11 @@ Support for writing "Making-Of" docs in VS Code.
 - [x] [Automatically perform commits from within the "Making-Of" docs](#plan)
 
 
+## Possible enhancements
+
+- [x] [Write a short README and optimize jekyll theme styling](#final-touches)
+
+
 ## Plan
 
 Here's a possible way to proceed:
@@ -89,3 +94,15 @@ Execute the real command.
 ```
 
 The extension should be usable now!
+
+
+## Final touches
+
+<a id="commit-2021-11-18-12-28"></a>
+
+[commit-2021-11-18-12-28](https://github.com/pitnyr/making-of-vscode/commit/b3524b4288cb4d8e2bf63d7ef965842ecc067554)
+```email
+subject: Final touches
+
+Write a short README and change some extension properties.
+```
