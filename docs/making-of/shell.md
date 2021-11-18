@@ -11,6 +11,8 @@
 - [x] [Show Errors somewhere without changing the selected text](#replace-the-currently-selected-text-with-the-output)
 
 
+<a id="commit-2021-11-14-12-35"></a>
+
 ## Be able to start a shell command from within the extension
 
 This should be the biggest part.
@@ -27,13 +29,13 @@ This can be used to determine the default working directory the command is run.
 
 Fighting Typescript and Javascript, I finally am able to execute "pwd && whoami" and get the result back.
 
-<a id="commit-2021-11-14-12-35"></a>
-
 [commit-2021-11-14-12-35](https://github.com/pitnyr/making-of-vscode/commit/04ee906b4e4286883a65222960e949da5e018380)
 ```email
 subject: Execute shell command and capture stdout
 ```
 
+
+<a id="commit-2021-11-14-15-00"></a>
 
 ## Set the correct working directory
 
@@ -41,13 +43,13 @@ The desired diretory should be the shortest path of the workspace folders,
 given that there currently are two: the root and the .gh-pages folder.
 Suprisingly (for me): there are no higher order functions like "minBy".
 
-<a id="commit-2021-11-14-15-00"></a>
-
 [commit-2021-11-14-15-00](https://github.com/pitnyr/making-of-vscode/commit/689deebf835e43a937e34aac14ecc0d976c33048)
 ```email
 subject: Execute shell command in correct directory
 ```
 
+
+<a id="commit-2021-11-14-15-20"></a>
 
 ## Replace the currently selected text with the output
 
@@ -57,8 +59,6 @@ Also:
 - Show Errors somewhere without changing the selected text
 
 This can be found in the "Edit With Shell Command" extension for sure!
-
-<a id="commit-2021-11-14-15-20"></a>
 
 [commit-2021-11-14-15-20](https://github.com/pitnyr/making-of-vscode/commit/f8fa23827d4c43861a225774e6a22d76f1e0704b)
 ```email
