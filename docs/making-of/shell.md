@@ -1,3 +1,9 @@
+---
+title: shell
+parent: Making-Of
+nav_order: 2
+---
+
 # Feature: Copy the basics of the "Edit With Shell Command" extension
 
 

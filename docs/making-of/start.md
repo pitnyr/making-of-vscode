@@ -1,3 +1,9 @@
+---
+title: start
+parent: Making-Of
+nav_order: 1
+---
+
 # Feature: Setup the "getting started" extension
 
 

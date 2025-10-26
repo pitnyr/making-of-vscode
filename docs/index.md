@@ -1,3 +1,7 @@
+---
+title: Home
+---
+
 # VS Code Extension for Writing Making-Of Docs
 
 This VS Code extension supports writing "Making-Of" docs.

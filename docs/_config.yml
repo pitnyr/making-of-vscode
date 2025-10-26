@@ -1,1 +1,11 @@
-theme: jekyll-theme-midnight
+title: Making-Of Extension
+description: VS Code Extension for generating "Making-Of" style documentation
+
+baseurl: /making-of-vscode
+
+plugins:
+  - jekyll-remote-theme
+
+remote_theme: just-the-docs/just-the-docs
+
+enable_copy_code_button: false

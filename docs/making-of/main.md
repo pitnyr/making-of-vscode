@@ -1,3 +1,8 @@
+---
+title: Making-Of
+has_toc: false
+---
+
 # VS Code Extension for Writing Making-Of Docs
 
 

@@ -1,3 +1,9 @@
+---
+title: real-command
+parent: Making-Of
+nav_order: 3
+---
+
 # Feature: Execute the real commit command
 
 
