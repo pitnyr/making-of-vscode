@@ -16,12 +16,12 @@ export function activate(context: vscode.ExtensionContext) {
 async function commit(editor: vscode.TextEditor) {
 	try {
 		const sourceLink = await getSourceLink(vscode.workspace);
-		const makingOfLink = await getMakingOfLink(editor, vscode.workspace);
+		const [makingOfLink, docsDir] = await getMakingOfLinkAndDocsDir(editor, vscode.workspace);
 
 		const selectedLines = await getSelectedLines(editor);
 		const commitId = getCommitId();
-		const commitMessage = await getCommitMessage(selectedLines, makingOfLink, commitId);
-		const cwd = await getCwd(vscode.workspace.workspaceFolders);
+		const [commitMessage, isDocsLink] = await getCommitMessageAndDocsLink(selectedLines, makingOfLink, commitId);
+		const cwd = await getCwd(isDocsLink, docsDir, vscode.workspace.workspaceFolders);
 
 		const commitHash = await executeCommit(commitMessage, cwd);
 
@@ -56,11 +56,12 @@ async function getSourceLink(workspace: typeof vscode.workspace): Promise<string
 			sourceUrl += '/';
 		}
 
-		resolve(sourceUrl + 'commit/');
+		const sourceLink = sourceUrl + 'commit/';
+		resolve(sourceLink);
 	});
 }
 
-async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vscode.workspace): Promise<string> {
+async function getMakingOfLinkAndDocsDir(editor: vscode.TextEditor, workspace: typeof vscode.workspace): Promise<[string, string]> {
 	return new Promise((resolve, reject) => {
 		const settings = workspace.getConfiguration('making-of');
 
@@ -88,7 +89,9 @@ async function getMakingOfLink(editor: vscode.TextEditor, workspace: typeof vsco
 			reject(new Error('current file not in localPath'));
 		} else {
 			const base = path.dirname(filePath) + '/' + path.basename(filePath, '.md');
-			resolve(publishUrl + base.slice(startIndex + localPath.length) + '.html');
+			const makingOfLink = publishUrl + base.slice(startIndex + localPath.length) + '.html';
+			const docsDir = filePath.slice(0, startIndex);
+			resolve([makingOfLink, docsDir]);
 		}
 	});
 }
@@ -116,7 +119,7 @@ function getCommitId(): string {
 		('0' + now.getMinutes()).slice(-2);
 }
 
-async function getCommitMessage(selectedLines: string[], makingOfLink: string, commitId: string): Promise<string> {
+async function getCommitMessageAndDocsLink(selectedLines: string[], makingOfLink: string, commitId: string): Promise<[string, boolean]> {
 	return new Promise((resolve, reject) => {
 
 		if (selectedLines[selectedLines.length - 1].length > 0) {
@@ -125,7 +128,12 @@ async function getCommitMessage(selectedLines: string[], makingOfLink: string, c
 		}
 		selectedLines.pop();
 
-		const subject = selectedLines[0];
+		let subject = selectedLines[0];
+		let isDocsLink = false;
+		if (subject.startsWith('docs: ')) {
+			subject = subject.slice(6);
+			isDocsLink = true;
+		}
 		if (subject.length === 0) {
 			reject(new Error('subject (first line) is empty'));
 			return;
@@ -152,13 +160,16 @@ async function getCommitMessage(selectedLines: string[], makingOfLink: string, c
 		}
 
 		const linkLine = 'See ' + makingOfLink + '#' + commitId;
-		resolve([subject, '', linkLine, ...body, ''].join('\n'));
+		const commitMessage = [subject, '', linkLine, ...body, ''].join('\n');
+		resolve([commitMessage, isDocsLink]);
 	});
 }
 
-async function getCwd(folders: readonly vscode.WorkspaceFolder[] | undefined): Promise<string> {
+async function getCwd(isDocsLink: boolean, docsDir: string, folders: readonly vscode.WorkspaceFolder[] | undefined): Promise<string> {
 	return new Promise((resolve, reject) => {
-		if (folders === undefined || folders.length === 0) {
+		if (isDocsLink) {
+			resolve(docsDir);
+		} else if (folders === undefined || folders.length === 0) {
 			reject(new Error('no workspace folders'));
 		} else {
 			resolve(folders
