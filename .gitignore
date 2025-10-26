@@ -1,8 +1,8 @@
-.gh-pages/
 .vscode-test/
 
 *.vsix
 
 dist
 node_modules
+notes
 out
