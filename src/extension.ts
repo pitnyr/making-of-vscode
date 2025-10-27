@@ -1,4 +1,5 @@
 import * as child_process from 'child_process';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
@@ -24,8 +25,9 @@ async function commit(editor: vscode.TextEditor) {
 		const cwd = await getCwd(isDocsLink, docsDir, vscode.workspace.workspaceFolders);
 
 		const commitHash = await executeCommit(commitMessage, cwd);
+		await addCommitMapping(commitId, commitHash, docsDir);
 
-		const finalText = getFinalText(selectedLines, commitId, sourceLink, commitHash);
+		const finalText = getFinalText(selectedLines, commitId);
 		await replaceSelectedText(editor, finalText);
 
 		vscode.window.setStatusBarMessage('Done', 3000);
@@ -88,9 +90,10 @@ async function getMakingOfLinkAndDocsDir(editor: vscode.TextEditor, workspace: t
 		if (startIndex < 0) {
 			reject(new Error('current file not in localPath'));
 		} else {
+			const endIndex = startIndex + localPath.length;
 			const base = path.dirname(filePath) + '/' + path.basename(filePath, '.md');
-			const makingOfLink = publishUrl + base.slice(startIndex + localPath.length) + '.html';
-			const docsDir = filePath.slice(0, startIndex);
+			const makingOfLink = publishUrl + base.slice(endIndex) + '.html';
+			const docsDir = filePath.slice(0, endIndex);
 			resolve([makingOfLink, docsDir]);
 		}
 	});
@@ -111,8 +114,7 @@ async function getSelectedLines(editor: vscode.TextEditor): Promise<string[]> {
 
 function getCommitId(): string {
 	const now = new Date();
-	return 'commit-' +
-		now.getFullYear() + '-' +
+	return now.getFullYear() + '-' +
 		('0' + (now.getMonth() + 1)).slice(-2) + '-' +
 		('0' + now.getDate()).slice(-2) + '-' +
 		('0' + now.getHours()).slice(-2) + '-' +
@@ -159,7 +161,7 @@ async function getCommitMessageAndDocsLink(selectedLines: string[], makingOfLink
 			}
 		}
 
-		const linkLine = 'See ' + makingOfLink + '#' + commitId;
+		const linkLine = 'See ' + makingOfLink + '#commit-' + commitId;
 		const commitMessage = [subject, '', linkLine, ...body, ''].join('\n');
 		resolve([commitMessage, isDocsLink]);
 	});
@@ -208,10 +210,21 @@ async function executeCommit(input: string, cwd: string): Promise<string> {
 	});
 }
 
-function getFinalText(selectedLines: string[], commitId: string, sourceLink: string, commitHash: string) {
-	return '<a id="' + commitId + '"></a>\n' +
+async function addCommitMapping(commitId: string, commitHash: string, docsDir: string) {
+	const mappingFile = path.join(docsDir, '_data', 'commits.yml');
+	const newEntry = `${commitId}: ${commitHash}\n`;
+	try {
+		await fs.access(mappingFile);
+		await fs.appendFile(mappingFile, newEntry, 'utf8');
+	} catch {
+		vscode.window.showWarningMessage(`Could not write ${newEntry} to ${mappingFile}`);
+	}
+}
+
+function getFinalText(selectedLines: string[], commitId: string) {
+	return '<a id="commit-' + commitId + '"></a>\n' +
 		'\n' +
-		'[' + commitId + '](' + sourceLink + commitHash + ')\n' +
+		'{% include commit id="' + commitId + '" %}\n' +
 		'```email\n' +
 		'subject: ' + selectedLines.join('\n') + '\n' +
 		'```\n';
