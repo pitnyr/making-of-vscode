@@ -35,7 +35,7 @@ This can be used to determine the default working directory the command is run.
 
 Fighting Typescript and Javascript, I finally am able to execute "pwd && whoami" and get the result back.
 
-[commit-2021-11-14-12-35](https://github.com/pitnyr/making-of-vscode/commit/04ee906b4e4286883a65222960e949da5e018380)
+{% include commit id="2021-11-14-12-35" %}
 ```email
 subject: Execute shell command and capture stdout
 ```
@@ -49,7 +49,7 @@ The desired diretory should be the shortest path of the workspace folders,
 given that there currently are two: the root and the .gh-pages folder.
 Suprisingly (for me): there are no higher order functions like "minBy".
 
-[commit-2021-11-14-15-00](https://github.com/pitnyr/making-of-vscode/commit/689deebf835e43a937e34aac14ecc0d976c33048)
+{% include commit id="2021-11-14-15-00" %}
 ```email
 subject: Execute shell command in correct directory
 ```
@@ -66,7 +66,7 @@ Also:
 
 This can be found in the "Edit With Shell Command" extension for sure!
 
-[commit-2021-11-14-15-20](https://github.com/pitnyr/making-of-vscode/commit/f8fa23827d4c43861a225774e6a22d76f1e0704b)
+{% include commit id="2021-11-14-15-20" %}
 ```email
 subject: Replace currently selected text with shell output
 ```

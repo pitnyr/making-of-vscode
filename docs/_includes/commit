@@ -1,0 +1,1 @@
+[commit-{{ include.id }}](https://github.com/{{ site.github_user }}/{{ site.github_repo }}/commit/{{ site.data.commits[include.id] }})

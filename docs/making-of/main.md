@@ -21,6 +21,11 @@ Support for writing "Making-Of" docs in VS Code.
 - [x] [Write a short README and optimize jekyll theme styling](#final-touches)
 
 
+## Revival
+
+- [x] [2025-10: New theme, more flexible bidirectional links](#new-theme-more-flexible-bidirectional-links)
+
+
 ## Plan
 
 Here's a possible way to proceed:
@@ -39,7 +44,7 @@ and then add more and more functionality from the "Edit With Shell Command" exte
 
 ## Step 1 - First Commit
 
-[commit-2021-11-01-19-45](https://github.com/pitnyr/making-of-vscode/commit/376c967dbd660b7754afe229343a0a87c21f397b)
+{% include commit id="2021-11-01-19-45" %}
 ```email
 subject: Add first commit: MIT license file
 ```
@@ -51,7 +56,7 @@ subject: Add first commit: MIT license file
 
 For setting up the getting started example I create a feature branch named "[start](start.md)".
 
-[commit-2021-11-01-21-00](https://github.com/pitnyr/making-of-vscode/commit/7f341007c49fb5c9bad93be71ad0daf02b73a41d)
+{% include commit id="2021-11-01-21-00" %}
 ```email
 subject: Merge branch 'start'
 
@@ -68,7 +73,7 @@ In feature branch "[shell](shell.md)" I'll copy the basics I need from the "Edit
 But before that, I move the gh-pages workspace into a ".gitignored" subfolder of the project root
 and add a VS Code workspace with the gh-pages folder and the root folder:
 
-[commit-2021-11-14-07-40](https://github.com/pitnyr/making-of-vscode/commit/717856eda8f70d3fa5caad3e75a02ab415bee977)
+{% include commit id="2021-11-14-07-40" %}
 ```email
 subject: Change editing environment
 ```
@@ -77,7 +82,7 @@ subject: Change editing environment
 
 Implemented:
 
-[commit-2021-11-14-15-25](https://github.com/pitnyr/making-of-vscode/commit/0adfe88f4bb40a911d95210fc022818d70e3365e)
+{% include commit id="2021-11-14-15-25" %}
 ```email
 subject: Merge branch 'shell'
 
@@ -91,7 +96,7 @@ Edit With Shell Command.
 
 This is handled in feature branch "[real-command](real-command.md)".
 
-[commit-2021-11-15-10-50](https://github.com/pitnyr/making-of-vscode/commit/b89bc0bb99de1dcbfe9a6f94f49279da02654c7e)
+{% include commit id="2021-11-15-10-50" %}
 ```email
 subject: Merge branch 'real-command'
 
@@ -105,9 +110,27 @@ The extension should be usable now!
 
 ## Final touches
 
-[commit-2021-11-18-12-28](https://github.com/pitnyr/making-of-vscode/commit/b3524b4288cb4d8e2bf63d7ef965842ecc067554)
+{% include commit id="2021-11-18-12-28" %}
 ```email
 subject: Final touches
 
 Write a short README and change some extension properties.
+```
+
+
+<a id="commit-2025-10-27-13-53"></a>
+
+## New Theme, More Flexible Bidirectional Links
+
+This is handled in feature branch "[changes-2025-10](changes-2025-10.md)".
+
+{% include commit id="2025-10-27-13-53" %}
+```email
+subject: Merge branch 'changes-2025-10'
+
+- New branch and directory structure
+- New theme "Just the Docs"
+- Local test environment
+- Links to the documentation branch
+- More flexible bidirectional links
 ```
